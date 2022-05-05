@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { FormHandles } from '@unform/core';
+import { Form } from '@unform/web';
+import { FiSearch } from 'react-icons/fi';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
 import Starships from '../../services/starships';
 
 interface SpaceshipData {
@@ -8,27 +13,28 @@ interface SpaceshipData {
 }
 
 const Home: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
   const [distance, setDistance] = useState('');
   const [spaceships, setSpaceships] = useState<Array<any>>();
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  useEffect(() => {
+  const handleSubmit = useCallback(async (data: any) => {
     setIsLoading(true);
-    const loadInfo = async (): Promise<void> => {
-      try {
-        const response = await Starships.list(500);
-        setSpaceships(response.starships);
-      } catch (error) {
-        setHasError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadInfo();
+    try {
+      const response = await Starships.list(data.distance);
+      setSpaceships(response.starships);
+    } catch (error) {
+      setHasError(true);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
   return (
     <div>
+      <Form ref={formRef} onSubmit={handleSubmit}>
+        <Input name="distance" icon={FiSearch} placeholder="10000" />
+        <Button type="submit">Calcular</Button>
+      </Form>
       {hasError && <>Erro</>}
       {isLoading && <>Loading</>}
       <ul>

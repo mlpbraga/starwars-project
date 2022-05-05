@@ -18,7 +18,7 @@ interface StarshipDetailsData {
 }
 
 const Starships = {
-  list: async (distance: number) => {
+  list: async (distance: any) => {
     const response = await api.get('/starships');
 
     const nextPage = response.data.next;
