@@ -13,3 +13,18 @@ export const Container = styled.div`
     padding: 5px;
   }
 `;
+
+export const PaginationContainer = styled.div`
+  justify-content: space-evenly;
+  margin: 20px auto 0;
+  padding: 20px;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+`;
+
+export const CurrentPage = styled.div`
+  margin-top: 18px;
+  max-width: 150px;
+`;

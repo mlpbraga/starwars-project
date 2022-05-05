@@ -8,6 +8,7 @@ export const Container = styled.button`
   border: 0;
   color: #312e38;
   padding: 0 16px;
+  max-width: 200px;
   width: 100%;
   font-weight: 500;
   margin-top: 16px;
@@ -15,5 +16,10 @@ export const Container = styled.button`
 
   &:hover {
     background: ${shade(0.2, '#ff9000')};
+  }
+
+  &:disabled {
+    background: ${shade(0.2, '#cccccc')};
+    cursor: not-allowed;
   }
 `;

@@ -19,31 +19,22 @@ interface StarshipDetailsData {
 }
 
 const Starships = {
-  list: async (distance: any) => {
-    const response = await api.get('/starships');
+  list: async (page = '1') => {
+    const response = await api.get(`/starships?page=${page}&limit=15`);
 
     const nextPage = response.data.next;
     const previousPage = response.data.previous;
     const starshipsList = response.data.results;
-    const idsList = starshipsList.map((item: StarshipListData) => item.uid);
-    const starshipsData = await Promise.all(
-      idsList.map((id: number) => Starships.get(id)),
-    );
-    if (!_.isEmpty(starshipsData)) {
-      const formattedStarship = starshipsData.map((item: any) => {
-        return {
-          uid: item.result.uid,
-          name: item.result.properties.name,
-          stops: Math.ceil(distance / Number(item.result.properties.MGLT)),
-        };
-      });
-      return {
-        next: nextPage,
-        previous: previousPage,
-        starships: formattedStarship,
-      };
-    }
-    return {};
+    const idsList = starshipsList.map((item: StarshipListData) => ({
+      uid: item.uid,
+      name: item.name,
+    }));
+
+    return {
+      next: nextPage,
+      previous: previousPage,
+      starships: idsList,
+    };
   },
   get: async (id: number): Promise<StarshipDetailsData> => {
     const response = await api.get(`/starships/${id}`);
