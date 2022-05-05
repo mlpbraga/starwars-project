@@ -11,6 +11,7 @@ interface StarshipDetailsData {
   message: string;
   result: {
     properties: {
+      uid: string;
       name: string;
       MGLT: string;
     };
@@ -31,7 +32,7 @@ const Starships = {
     if (!_.isEmpty(starshipsData)) {
       const formattedStarship = starshipsData.map((item: any) => {
         return {
-          uid: item.result.properties.uid,
+          uid: item.result.uid,
           name: item.result.properties.name,
           stops: Math.ceil(distance / Number(item.result.properties.MGLT)),
         };

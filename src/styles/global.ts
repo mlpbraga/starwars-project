@@ -1,4 +1,12 @@
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
+import loadingSpinner from '../assets/loading.svg';
+
+export const Loading = styled.div`
+  background: url(${loadingSpinner}) no-repeat center;
+  color: transparent;
+  height: 80px;
+  background-size: 10%;
+`;
 
 export default createGlobalStyle`
   * {
