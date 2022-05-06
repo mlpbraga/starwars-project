@@ -20,6 +20,17 @@ interface Errors {
   [key: string]: string;
 }
 
+const pageText = {
+  title: 'Intergalactic Stops Calculator',
+  description: `The results shows a list of availiable Spaceships and the amount of
+  stops they need to archieve this distance.`,
+  inputPlaceholder: 'Distance to travel in MGLT',
+  calculateButton: 'Calculate',
+  resultTitle: 'Results',
+  resultsDescription: `List of spaceships and the respective amount of stops needed to
+  reach the distance of `,
+};
+
 const getValidationErrors = (errors: Yup.ValidationError): Errors => {
   const validationErrors: Errors = {};
   errors.inner.forEach(error => {
@@ -108,32 +119,32 @@ const Home: React.FC = () => {
   return (
     <Container>
       <Form ref={formRef} onSubmit={handleSubmit}>
-        <h1>Intergalactic Stops Calculator</h1>
-        <p>
-          The results shows a list of availiable Spaceships and the amount of
-          stops they need to archieve this distance.
-        </p>
+        <h1>{pageText.title}</h1>
+        <p>{pageText.description}</p>
         <InputContainer>
           <Input
             name="distance"
             icon={FiSearch}
-            placeholder="Distance to travel in MGLT"
+            placeholder={pageText.inputPlaceholder}
           />
-          <Button type="submit">Calculate</Button>
+          <Button type="submit">{pageText.calculateButton}</Button>
         </InputContainer>
       </Form>
+
       {hasError && (
         <ErrorContainer>
           <p>{errorMessage}</p>
         </ErrorContainer>
       )}
+
       {isLoading && <Loading />}
+
       {!hasError && !isLoading && spaceships && (
         <div>
-          <h1>Results</h1>
+          <h1>{pageText.resultTitle}</h1>
           <small>
-            List of spaceships and the respective amount of stops needed to
-            reach the distance of {distance} MGLT
+            {pageText.resultsDescription}
+            {distance} MGLT
           </small>
           <ul>
             {spaceships.map(item => (
