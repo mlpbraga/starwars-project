@@ -11,10 +11,18 @@ const Starships = {
         total: starshipsList.count,
         next: starshipsList.next,
         previous: starshipsList.previous,
-        starships: starshipsList.results.map(starship => ({
-          name: starship.name,
-          stops: Math.ceil(distance / Number(starship.MGLT)),
-        })),
+        starships: starshipsList.results.map(starship => {
+          let stops;
+          if (starship.MGLT !== 'unknown') {
+            stops = String(Math.ceil(distance / Number(starship.MGLT)));
+          } else {
+            stops = starship.MGLT;
+          }
+          return {
+            name: starship.name,
+            stops,
+          };
+        }),
       };
     } catch (error) {
       throw new Error(`[API Error] ${error.message}`);

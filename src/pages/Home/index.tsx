@@ -14,6 +14,7 @@ import {
   ListItem,
   InputContainer,
   ErrorContainer,
+  ResultsContainer,
 } from './styles';
 import { ProxyStarshipItemData } from '../../services/types';
 
@@ -21,6 +22,9 @@ import { pageText } from './staticText';
 
 interface Errors {
   [key: string]: string;
+}
+interface InputData {
+  distance: number;
 }
 
 const getValidationErrors = (errors: Yup.ValidationError): Errors => {
@@ -71,7 +75,7 @@ const Home: React.FC = () => {
   );
 
   const handleSubmit = useCallback(
-    async (data: any) => {
+    async (data: InputData) => {
       try {
         formRef.current?.setErrors({});
         const schema = Yup.object().shape({
@@ -134,7 +138,7 @@ const Home: React.FC = () => {
       {isLoading && <Loading />}
 
       {!hasError && !isLoading && starships && (
-        <div>
+        <ResultsContainer>
           <h1>{pageText.resultTitle}</h1>
           <small>
             {pageText.resultsDescription}
@@ -143,12 +147,7 @@ const Home: React.FC = () => {
           <ul>
             {starships.map(item => (
               <ListItem key={item.name}>
-                <li>
-                  <p>
-                    <b>{item.name}</b> needs <b>{item.stops}</b>{' '}
-                    {item.stops > 1 ? 'stops.' : 'stop.'}
-                  </p>
-                </li>
+                {item.name} : {item.stops}
               </ListItem>
             ))}
           </ul>
@@ -169,7 +168,7 @@ const Home: React.FC = () => {
               {pageText.nextButton}
             </Button>
           </PaginationContainer>
-        </div>
+        </ResultsContainer>
       )}
     </Container>
   );

@@ -33,7 +33,6 @@ export const PaginationContainer = styled.div`
 `;
 
 export const CurrentPageContainer = styled.div`
-  margin-top: 16px;
   max-width: 150px;
 `;
 
@@ -50,7 +49,7 @@ export const InputContainer = styled.div`
   }
 `;
 
-export const ListItem = styled.div`
+export const ListItem = styled.li`
   margin-bottom: 5px;
   display: flex;
   align-items: center;
@@ -58,23 +57,12 @@ export const ListItem = styled.div`
   font-size: 15px;
   border-radius: 10px;
   border: 2px solid #eeeef6;
-
-  li {
-    list-style-type: none;
-    align-items: center;
-    flex: 1;
-    padding: 10px 0;
-
-    small {
-      color: #a6a6a6;
-    }
-    p {
-      color: #3d3d4d;
-    }
-  }
-  & + li {
-    margin-top: 16px;
-  }
+  margin: 12px;
+  list-style-type: none;
+  align-items: center;
+  display: flex;
+  padding: 10px;
+  color: #3d3d4d;
 `;
 
 export const ErrorContainer = styled.div`
@@ -86,3 +74,5 @@ export const ErrorContainer = styled.div`
     color: #3d3d4d;
   }
 `;
+
+export const ResultsContainer = styled.div``;

@@ -12,7 +12,7 @@ export interface APIStartshipData {
 
 export interface ProxyStarshipItemData {
   name: string;
-  stops: number;
+  stops: string;
 }
 
 export interface ProxyStarshipData {
