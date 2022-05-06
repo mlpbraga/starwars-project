@@ -51,7 +51,6 @@ export const InputContainer = styled.div`
 `;
 
 export const ListItem = styled.div`
-  border: 1px solid black;
   margin-bottom: 5px;
   display: flex;
   align-items: center;
@@ -75,5 +74,15 @@ export const ListItem = styled.div`
   }
   & + li {
     margin-top: 16px;
+  }
+`;
+
+export const ErrorContainer = styled.div`
+  border-radius: 10px;
+  border: 2px solid #eeeef6;
+  background-color: #eeeef6;
+  padding: 8px;
+  p {
+    color: #3d3d4d;
   }
 `;

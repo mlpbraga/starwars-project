@@ -3,7 +3,6 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { FiSearch } from 'react-icons/fi';
 import * as Yup from 'yup';
-import _ from 'lodash';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import Starships from '../../services/starships';
@@ -14,11 +13,13 @@ import {
   CurrentPage,
   ListItem,
   InputContainer,
+  ErrorContainer,
 } from './styles';
 
 interface Errors {
   [key: string]: string;
 }
+
 const getValidationErrors = (errors: Yup.ValidationError): Errors => {
   const validationErrors: Errors = {};
   errors.inner.forEach(error => {
@@ -36,7 +37,9 @@ const Home: React.FC = () => {
   const [distance, setDistance] = useState<number>();
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState(
+    '[Error] Something went wrong',
+  );
   const loadSpaceshipList = useCallback(
     async (dist: number) => {
       setIsLoading(true);
@@ -51,7 +54,11 @@ const Home: React.FC = () => {
         setHasPrevious(!!response.previous);
       } catch (error) {
         setHasError(true);
-        console.log(error);
+        if (error.message === 'Network Error') {
+          setErrorMessage(
+            '[Network Error] Problems connecting to the Star Wars API server',
+          );
+        }
       } finally {
         setIsLoading(false);
       }
@@ -59,28 +66,31 @@ const Home: React.FC = () => {
     [page],
   );
 
-  const handleSubmit = useCallback(async (data: any) => {
-    try {
-      formRef.current?.setErrors({});
-      const schema = Yup.object().shape({
-        distance: Yup.string().required('Input some MGLT distance'),
-      });
-      await schema.validate(data, { abortEarly: false });
-      setDistance(data.distance);
-      await loadSpaceshipList(data.distance);
-    } catch (error) {
-      setHasError(true);
-      if (error instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(error);
-        formRef.current?.setErrors(errors);
-      } else if (error instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(error);
-        formRef.current?.setErrors(errors);
-      } else {
-        console.log(error);
+  const handleSubmit = useCallback(
+    async (data: any) => {
+      try {
+        formRef.current?.setErrors({});
+        const schema = Yup.object().shape({
+          distance: Yup.string().required('Input some MGLT distance'),
+        });
+        await schema.validate(data, { abortEarly: false });
+        setDistance(data.distance);
+        await loadSpaceshipList(data.distance);
+      } catch (error) {
+        setHasError(true);
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
+          formRef.current?.setErrors(errors);
+        } else if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
+          formRef.current?.setErrors(errors);
+        } else {
+          console.log(error);
+        }
       }
-    }
-  }, []);
+    },
+    [loadSpaceshipList],
+  );
 
   const handleNext = useCallback(async () => {
     setPage(page + 1);
@@ -93,7 +103,7 @@ const Home: React.FC = () => {
     if (distance) {
       loadSpaceshipList(distance);
     }
-  }, [page, distance]);
+  }, [page, distance, loadSpaceshipList]);
 
   return (
     <Container>
@@ -112,7 +122,11 @@ const Home: React.FC = () => {
           <Button type="submit">Calculate</Button>
         </InputContainer>
       </Form>
-      {hasError && <>Erro</>}
+      {hasError && (
+        <ErrorContainer>
+          <p>{errorMessage}</p>
+        </ErrorContainer>
+      )}
       {isLoading && <Loading />}
       {!hasError && !isLoading && spaceships && (
         <div>
