@@ -10,7 +10,7 @@ const cache = setupCache({
 });
 
 const api = axios.create({
-  baseURL: 'https://www.swapi.dev/api/',
+  baseURL: 'https://swapi.dev/api/',
   adapter: cache.adapter,
 });
 
