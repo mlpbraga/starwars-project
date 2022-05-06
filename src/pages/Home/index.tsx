@@ -15,6 +15,7 @@ import {
   InputContainer,
   ErrorContainer,
 } from './styles';
+import { ProxyStarshipItemData } from '../../services/types';
 
 import { pageText } from './staticText';
 
@@ -32,16 +33,17 @@ const getValidationErrors = (errors: Yup.ValidationError): Errors => {
 
 const Home: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-  const [starships, setStarships] = useState<Array<any>>();
-  const [page, setPage] = useState(1);
-  const [hasNext, setHasNext] = useState(false);
-  const [hasPrevious, setHasPrevious] = useState(false);
-  const [distance, setDistance] = useState<number>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasError, setHasError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>(
     '[Error] Something went wrong',
   );
+  const [page, setPage] = useState<number>(1);
+  const [starships, setStarships] = useState<Array<ProxyStarshipItemData>>();
+  const [hasNext, setHasNext] = useState<boolean>(false);
+  const [hasPrevious, setHasPrevious] = useState<boolean>(false);
+  const [distance, setDistance] = useState<number>();
+
   const loadStarshipList = useCallback(
     async (dist: number) => {
       setIsLoading(true);
@@ -94,12 +96,13 @@ const Home: React.FC = () => {
     [loadStarshipList],
   );
 
-  const handleNext = useCallback(async () => {
-    setPage(page + 1);
-  }, [page]);
-  const handlePrevious = useCallback(async () => {
-    setPage(page - 1);
-  }, [page]);
+  const handlePagination = useCallback(
+    (pageToGo: number) => {
+      if (pageToGo > page) setPage(page + 1);
+      else if (pageToGo < page) setPage(page - 1);
+    },
+    [page],
+  );
 
   useEffect(() => {
     if (distance) {
@@ -150,13 +153,19 @@ const Home: React.FC = () => {
             ))}
           </ul>
           <PaginationContainer>
-            <Button disabled={!hasPrevious} onClick={() => handlePrevious()}>
+            <Button
+              disabled={!hasPrevious}
+              onClick={() => handlePagination(page - 1)}
+            >
               {pageText.previousButton}
             </Button>
             <CurrentPageContainer>
               {pageText.currentPage}: {page}
             </CurrentPageContainer>
-            <Button disabled={!hasNext} onClick={() => handleNext()}>
+            <Button
+              disabled={!hasNext}
+              onClick={() => handlePagination(page + 1)}
+            >
               {pageText.nextButton}
             </Button>
           </PaginationContainer>
