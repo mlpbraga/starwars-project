@@ -32,7 +32,7 @@ export const PaginationContainer = styled.div`
   flex-direction: row;
 `;
 
-export const CurrentPage = styled.div`
+export const CurrentPageContainer = styled.div`
   margin-top: 16px;
   max-width: 150px;
 `;

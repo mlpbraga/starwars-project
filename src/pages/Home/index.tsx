@@ -10,7 +10,7 @@ import { Loading } from '../../styles/global';
 import {
   Container,
   PaginationContainer,
-  CurrentPage,
+  CurrentPageContainer,
   ListItem,
   InputContainer,
   ErrorContainer,
@@ -32,7 +32,7 @@ const getValidationErrors = (errors: Yup.ValidationError): Errors => {
 
 const Home: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-  const [spaceships, setSpaceships] = useState<Array<any>>();
+  const [starships, setStarships] = useState<Array<any>>();
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
@@ -42,16 +42,16 @@ const Home: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState(
     '[Error] Something went wrong',
   );
-  const loadSpaceshipList = useCallback(
+  const loadStarshipList = useCallback(
     async (dist: number) => {
       setIsLoading(true);
       setHasError(false);
       setHasNext(false);
       setHasPrevious(false);
-      setSpaceships([]);
+      setStarships([]);
       try {
         const response = await Starships.list(dist, String(page));
-        setSpaceships(response.starships);
+        setStarships(response.starships);
         setHasNext(!!response.next);
         setHasPrevious(!!response.previous);
       } catch (error) {
@@ -73,11 +73,11 @@ const Home: React.FC = () => {
       try {
         formRef.current?.setErrors({});
         const schema = Yup.object().shape({
-          distance: Yup.string().required('Input some MGLT distance'),
+          distance: Yup.number().required('Input some MGLT distance'),
         });
         await schema.validate(data, { abortEarly: false });
         setDistance(data.distance);
-        await loadSpaceshipList(data.distance);
+        await loadStarshipList(data.distance);
       } catch (error) {
         setHasError(true);
         if (error instanceof Yup.ValidationError) {
@@ -91,7 +91,7 @@ const Home: React.FC = () => {
         }
       }
     },
-    [loadSpaceshipList],
+    [loadStarshipList],
   );
 
   const handleNext = useCallback(async () => {
@@ -103,9 +103,9 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (distance) {
-      loadSpaceshipList(distance);
+      loadStarshipList(distance);
     }
-  }, [page, distance, loadSpaceshipList]);
+  }, [page, distance, loadStarshipList]);
 
   return (
     <Container>
@@ -130,7 +130,7 @@ const Home: React.FC = () => {
 
       {isLoading && <Loading />}
 
-      {!hasError && !isLoading && spaceships && (
+      {!hasError && !isLoading && starships && (
         <div>
           <h1>{pageText.resultTitle}</h1>
           <small>
@@ -138,7 +138,7 @@ const Home: React.FC = () => {
             {distance} MGLT
           </small>
           <ul>
-            {spaceships.map(item => (
+            {starships.map(item => (
               <ListItem key={item.name}>
                 <li>
                   <p>
@@ -151,11 +151,13 @@ const Home: React.FC = () => {
           </ul>
           <PaginationContainer>
             <Button disabled={!hasPrevious} onClick={() => handlePrevious()}>
-              {`<< `} PREVIOUS
+              {pageText.previousButton}
             </Button>
-            <CurrentPage>CURRENT PAGE: {page}</CurrentPage>
+            <CurrentPageContainer>
+              {pageText.currentPage}: {page}
+            </CurrentPageContainer>
             <Button disabled={!hasNext} onClick={() => handleNext()}>
-              NEXT{` >>`}
+              {pageText.nextButton}
             </Button>
           </PaginationContainer>
         </div>
