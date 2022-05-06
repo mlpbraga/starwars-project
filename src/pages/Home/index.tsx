@@ -16,20 +16,11 @@ import {
   ErrorContainer,
 } from './styles';
 
+import { pageText } from './staticText';
+
 interface Errors {
   [key: string]: string;
 }
-
-const pageText = {
-  title: 'Intergalactic Stops Calculator',
-  description: `The results shows a list of availiable Spaceships and the amount of
-  stops they need to archieve this distance.`,
-  inputPlaceholder: 'Distance to travel in MGLT',
-  calculateButton: 'Calculate',
-  resultTitle: 'Results',
-  resultsDescription: `List of spaceships and the respective amount of stops needed to
-  reach the distance of `,
-};
 
 const getValidationErrors = (errors: Yup.ValidationError): Errors => {
   const validationErrors: Errors = {};
@@ -148,7 +139,7 @@ const Home: React.FC = () => {
           </small>
           <ul>
             {spaceships.map(item => (
-              <ListItem key={item.uid}>
+              <ListItem key={item.name}>
                 <li>
                   <p>
                     <b>{item.name}</b> needs <b>{item.stops}</b>{' '}
