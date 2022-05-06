@@ -8,7 +8,13 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import Starships from '../../services/starships';
 import { Loading } from '../../styles/global';
-import { Container, PaginationContainer, CurrentPage } from './styles';
+import {
+  Container,
+  PaginationContainer,
+  CurrentPage,
+  ListItem,
+  InputContainer,
+} from './styles';
 
 interface Errors {
   [key: string]: string;
@@ -21,50 +27,53 @@ const getValidationErrors = (errors: Yup.ValidationError): Errors => {
   return validationErrors;
 };
 
-const getPage = (item: string): string => {
-  if (!_.isEmpty(item)) {
-    const urlObject = new URL(item);
-    const page = urlObject.searchParams.get('page');
-    return page || '';
-  }
-  return '1';
-};
-
 const Home: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const [spaceships, setSpaceships] = useState<Array<any>>();
   const [page, setPage] = useState(1);
-  const [distance, setDistance] = useState('');
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
+  const [distance, setDistance] = useState<number>();
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  const loadSpaceshipInfo = useCallback(async (pageNumber: string) => {
-    setIsLoading(true);
-    setHasError(false);
-    setHasNext(false);
-    setHasPrevious(false);
-    setSpaceships([]);
-    try {
-      const response = await Starships.list(pageNumber);
-      setSpaceships(response.starships);
-      setHasNext(!!response.next);
-      setHasPrevious(!!response.previous);
-    } catch (error) {
-      setHasError(true);
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const loadSpaceshipList = useCallback(
+    async (dist: number) => {
+      setIsLoading(true);
+      setHasError(false);
+      setHasNext(false);
+      setHasPrevious(false);
+      setSpaceships([]);
+      try {
+        const response = await Starships.list(dist, String(page));
+        setSpaceships(response.starships);
+        setHasNext(!!response.next);
+        setHasPrevious(!!response.previous);
+      } catch (error) {
+        setHasError(true);
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [page],
+  );
 
   const handleSubmit = useCallback(async (data: any) => {
     try {
-      console.log('handleSubmit');
+      formRef.current?.setErrors({});
+      const schema = Yup.object().shape({
+        distance: Yup.string().required('Input some MGLT distance'),
+      });
+      await schema.validate(data, { abortEarly: false });
+      setDistance(data.distance);
+      await loadSpaceshipList(data.distance);
     } catch (error) {
       setHasError(true);
       if (error instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(error);
+        formRef.current?.setErrors(errors);
+      } else if (error instanceof Yup.ValidationError) {
         const errors = getValidationErrors(error);
         formRef.current?.setErrors(errors);
       } else {
@@ -73,33 +82,55 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     setPage(page + 1);
   }, [page]);
-  const handlePrevious = useCallback(() => {
+  const handlePrevious = useCallback(async () => {
     setPage(page - 1);
   }, [page]);
 
   useEffect(() => {
-    const loadInfo = async (): Promise<void> => {
-      await loadSpaceshipInfo(String(page));
-    };
-    loadInfo();
-  }, [page, loadSpaceshipInfo]);
+    if (distance) {
+      loadSpaceshipList(distance);
+    }
+  }, [page, distance]);
 
   return (
     <Container>
       <Form ref={formRef} onSubmit={handleSubmit}>
-        <Input name="distance" icon={FiSearch} placeholder="10000" />
-        <Button type="submit">Calcular</Button>
+        <h1>Intergalactic Stops Calculator</h1>
+        <p>
+          The results shows a list of availiable Spaceships and the amount of
+          stops they need to archieve this distance.
+        </p>
+        <InputContainer>
+          <Input
+            name="distance"
+            icon={FiSearch}
+            placeholder="Distance to travel in MGLT"
+          />
+          <Button type="submit">Calculate</Button>
+        </InputContainer>
       </Form>
       {hasError && <>Erro</>}
       {isLoading && <Loading />}
       {!hasError && !isLoading && spaceships && (
         <div>
+          <h1>Results</h1>
+          <small>
+            List of spaceships and the respective amount of stops needed to
+            reach the distance of {distance} MGLT
+          </small>
           <ul>
             {spaceships.map(item => (
-              <li key={item.uid}>{item.name}</li>
+              <ListItem key={item.uid}>
+                <li>
+                  <p>
+                    <b>{item.name}</b> needs <b>{item.stops}</b>{' '}
+                    {item.stops > 1 ? 'stops.' : 'stop.'}
+                  </p>
+                </li>
+              </ListItem>
             ))}
           </ul>
           <PaginationContainer>
