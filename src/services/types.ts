@@ -1,6 +1,7 @@
 export interface APIStartshipItemData {
   name: string;
   MGLT: string;
+  consumables: string;
 }
 
 export interface APIStartshipData {
